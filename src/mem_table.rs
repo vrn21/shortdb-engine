@@ -49,4 +49,25 @@ impl MemTable{
         }
     }
 
+    pub fn delete(&mut self, key: &[u8], timestamp :u128){
+       let entry = MemTable{
+           key: key.to_owned(),
+           value: None,
+           timestamp:timestamp,
+           tombstone:true,
+       } 
+        match self.get_index(key) {
+            Ok(idx) => {
+                if let Some(v) = self.entries[idx].as_ref() {
+                    self.size -= v.len();
+                }
+                self.entries[idx] = entry;
+            }
+            Err(idx) => {
+                //did not find value with the key, so why should we add it to the memtable?
+            }
+        }
+
+    }
+
 } 
